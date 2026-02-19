@@ -1,1 +1,32 @@
-python-stack/Dataset/
+# Data directories (local datasets, processed data, images)
+data/
+
+# Trained model files (keep model code .py files, exclude .pkl, .pt, .json)
+models/**/*.pkl
+models/**/*.pt
+models/**/*.json
+models/**/*.h5
+models/**/*.pth
+
+# Dataset folder
+Dataset/
+
+# Legacy folder
+AgriTech/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+venv/
+env/
+
+# Logs
+*.log
