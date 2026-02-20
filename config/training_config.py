@@ -161,6 +161,61 @@ IRRIGATION_CONFIG = {
 }
 
 # =============================================================================
+# Fertilizer Recommendation Model Configuration (NEW)
+# =============================================================================
+FERTILIZER_CONFIG = {
+    'model_type': 'random_forest',  # Options: 'random_forest', 'gradient_boosting'
+    'random_forest': {
+        'n_estimators': 100,
+        'max_depth': 15,
+        'min_samples_split': 5,
+        'min_samples_leaf': 2,
+        'random_state': 42
+    },
+    'gradient_boosting': {
+        'n_estimators': 100,
+        'max_depth': 10,
+        'learning_rate': 0.1,
+        'random_state': 42
+    },
+    'test_size': 0.2,
+    'random_state': 42
+}
+
+# =============================================================================
+# Soil Classification Model Configuration (NEW)
+# =============================================================================
+SOIL_CONFIG = {
+    'model_type': 'custom',  # Options: 'custom', 'mobilenet', 'resnet'
+    'image_size': (224, 224),
+    'batch_size': 32,
+    'epochs': 50,
+    'learning_rate': 0.001,
+    
+    # Data augmentation
+    'augmentation': {
+        'rotation_range': 20,
+        'width_shift_range': 0.2,
+        'height_shift_range': 0.2,
+        'shear_range': 0.2,
+        'zoom_range': 0.2,
+        'horizontal_flip': True,
+        'fill_mode': 'nearest'
+    },
+    
+    # Data split
+    'train_split': 0.70,
+    'val_split': 0.15,
+    'test_split': 0.15,
+    
+    # Callbacks
+    'early_stopping_patience': 10,
+    'reduce_lr_patience': 5,
+    'reduce_lr_factor': 0.5,
+    'min_lr': 1e-7
+}
+
+# =============================================================================
 # Logging Configuration
 # =============================================================================
 LOGGING_CONFIG = {

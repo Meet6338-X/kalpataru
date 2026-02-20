@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriOracle — Kalpataru Labs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Google Translate -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,bn,ta,te,mr,gu,kn,ml,pa,or,as,ur',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <!-- Noise Overlay -->
+    <svg class="noise-overlay" xmlns="http://www.w3.org/2000/svg">
+        <filter id="noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noise)"/>
+    </svg>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <span class="logo-icon">🌾</span>
+                <span class="logo-text">AGRIORACLE</span>
+            </a>
+            <div class="nav-links">
+                <a href="#home" class="nav-link active">HOME</a>
+                <a href="#modules" class="nav-link">MODULES</a>
+                <a href="#ai-assistant" class="nav-link">AI ASSISTANT</a>
+                <a href="#about" class="nav-link">ABOUT</a>
+                <div id="google_translate_element" class="translate-widget"></div>
+            </div>
+            <button class="nav-menu-btn" id="menuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#home" class="mobile-link">HOME</a>
+        <a href="#modules" class="mobile-link">MODULES</a>
+        <a href="#ai-assistant" class="mobile-link">AI ASSISTANT</a>
+        <a href="#about" class="mobile-link">ABOUT</a>
+        <div class="mobile-translate">
+            <span class="translate-label">LANGUAGE:</span>
+            <div id="google_translate_element_mobile"></div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="title-line" style="--delay: 0">AGRI</span>
+                <span class="title-line" style="--delay: 1">ORACLE</span>
+            </h1>
+            <p class="hero-subtitle">INDIA'S FIRST FARM DECISION OPERATING SYSTEM</p>
+            <div class="hero-cta">
+                <a href="#ai-assistant" class="btn btn-primary">START EXPLORING</a>
+                <a href="#modules" class="btn btn-secondary">VIEW MODULES</a>
+            </div>
+        </div>
+        <div class="hero-images">
+            <div class="floating-img" style="--delay: 0">
+                <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400" alt="Farm">
+            </div>
+            <div class="floating-img" style="--delay: 1">
+                <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400" alt="Crops">
+            </div>
+            <div class="floating-img" style="--delay: 2">
+                <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400" alt="Harvest">
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>SCROLL</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Modules Section -->
+    <section class="modules" id="modules">
+        <div class="container">
+            <h2 class="section-title">MODULES</h2>
+            <div class="modules-grid">
+                <!-- AI Assistant -->
+                <div class="module-card" data-module="ai-assistant">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400" alt="AI">
+                        <div class="card-overlay">
+                            <span class="card-cta">EXPLORE</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-icon">🤖</span>
+                        <h3 class="card-title">AI ASSISTANT</h3>
+                        <p class="card-desc">Intelligent chatbot with image understanding and agricultural knowledge</p>
+                    </div>
+                </div>
+
+                <!-- Disease Detection -->
+                <div class="module-card" data-module="disease">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1598512752271-33f913a5af13?w=400" alt="Disease">
+                        <div class="card-overlay">
+                            <span class="card-cta">EXPLORE</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-icon">🦠</span>
+                        <h3 class="card-title">DISEASE DETECTION</h3>
+                        <p class="card-desc">CNN-based plant disease detection with 38 disease classes</p>
+                    </div>
+                </div>
+
+                <!-- Crop Recommendation -->
+                <div class="module-card" data-module="crop">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400" alt="Crops">
+                        <div class="card-overlay">
+                            <span class="card-cta">EXPLORE</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-icon">🌱</span>
+                        <h3 class="card-title">CROP RECOMMENDATION</h3>
+                        <p class="card-desc">AI-powered crop suggestions based on soil and climate</p>
+                    </div>
+                </div>
+
+                <!-- Fertilizer -->
+                <div class="module-card" data-module="fertilizer">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400" alt="Fertilizer">
+                        <div class="card-overlay">
+                            <span class="card-cta">EXPLORE</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-icon">🧪</span>
+                        <h3 class="card-title">FERTILIZER ADVICE</h3>
+                        <p class="card-desc">Smart fertilizer suggestions based on soil nutrients</p>
+                    </div>
+                </div>
+
+                <!-- Weather -->
+                <div class="module-card" data-module="weather">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=400" alt="Weather">
+                        <div class="card-overlay">
+                            <span class="card-cta">EXPLORE</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-icon">🌤️</span>
+                        <h3 class="card-title">WEATHER FORECAST</h3>
+                        <p class="card-desc">Real-time weather data and agricultural insights</p>
+                    </div>
+                </div>
+
+                <!-- Yield Prediction -->
+                <div class="module-card" data-module="yield">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=400" alt="Yield">
+                        <div class="card-overlay">
+                            <span class="card-cta">EXPLORE</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-icon">📈</span>
+                        <h3 class="card-title">YIELD PREDICTION</h3>
+                        <p class="card-desc">ML-based crop yield forecasting</p>
+                    </div>
+                </div>
+
+                <!-- Soil Classification -->
+                <div class="module-card" data-module="soil">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400" alt="Soil">
+                        <div class="card-overlay">
+                            <span class="card-cta">EXPLORE</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-icon">🏔️</span>
+                        <h3 class="card-title">SOIL CLASSIFICATION</h3>
+                        <p class="card-desc">Image-based soil type identification</p>
+                    </div>
+                </div>
+
+                <!-- Risk Assessment -->
+                <div class="module-card" data-module="risk">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400" alt="Risk">
+                        <div class="card-overlay">
+                            <span class="card-cta">EXPLORE</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-icon">📊</span>
+                        <h3 class="card-title">RISK ASSESSMENT</h3>
+                        <p class="card-desc">Agricultural risk scoring for insurance</p>
+                    </div>
+                </div>
+
+                <!-- Irrigation -->
+                <div class="module-card" data-module="irrigation">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400" alt="Irrigation">
+                        <div class="card-overlay">
+                            <span class="card-cta">EXPLORE</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-icon">💧</span>
+                        <h3 class="card-title">IRRIGATION</h3>
+                        <p class="card-desc">Smart irrigation recommendations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Assistant Section -->
+    <section class="ai-section" id="ai-assistant">
+        <div class="container">
+            <h2 class="section-title">AI ASSISTANT</h2>
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-status">
+                        <span class="status-dot"></span>
+                        <span>ONLINE</span>
+                    </div>
+                    <button class="clear-btn" id="clearChat">CLEAR CHAT</button>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <div class="message-text">Welcome to **AgriOracle**! I'm your intelligent agricultural assistant. Ask me anything about:
+
+- 🌱 **Crops** - Recommendations and best practices
+- 🦠 **Diseases** - Detection and treatment
+- 🧪 **Fertilizers** - NPK recommendations
+- 🏔️ **Soil** - Classification and health
+- 💧 **Irrigation** - Smart scheduling
+
+You can also **upload an image** for analysis!</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <div class="image-preview" id="imagePreview">
+                        <img src="" alt="Preview">
+                        <button class="remove-image" id="removeImage">×</button>
+                    </div>
+                    <div class="chat-input-wrapper">
+                        <label class="image-upload-btn">
+                            <input type="file" id="imageInput" accept="image/*" hidden>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                        </label>
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about crops, diseases, fertilizers...">
+                        <button class="send-btn" id="sendBtn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"/>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="quick-prompts">
+                    <button class="quick-prompt" data-prompt="What crops grow best in sandy soil?">🌱 Crops for sandy soil</button>
+                    <button class="quick-prompt" data-prompt="How to treat tomato blight?">🦠 Tomato blight treatment</button>
+                    <button class="quick-prompt" data-prompt="Best fertilizer for rice cultivation">🧪 Rice fertilizer</button>
+                    <button class="quick-prompt" data-prompt="Signs of nitrogen deficiency in plants">⚠️ Nitrogen deficiency</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2 class="section-title">ABOUT</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>INDIA'S FIRST FARM DECISION OPERATING SYSTEM</h3>
+                    <p>AgriOracle by Kalpataru Labs is an intelligent agricultural platform that combines machine learning, computer vision, and expert knowledge to help farmers make better decisions.</p>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number">38</span>
+                            <span class="stat-label">DISEASE CLASSES</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">15+</span>
+                            <span class="stat-label">CROPS SUPPORTED</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">10</span>
+                            <span class="stat-label">LANGUAGES</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">25+</span>
+                            <span class="stat-label">API ENDPOINTS</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <div>
+                            <h4>PRECISION AGRICULTURE</h4>
+                            <p>Data-driven recommendations for optimal yields</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔬</span>
+                        <div>
+                            <h4>AI-POWERED ANALYSIS</h4>
+                            <p>Advanced ML models for disease and soil detection</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🌐</span>
+                        <div>
+                            <h4>REAL-TIME DATA</h4>
+                            <p>Weather and market insights at your fingertips</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📱</span>
+                        <div>
+                            <h4>ACCESSIBLE</h4>
+                            <p>Works on any device, anywhere</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🌾</span>
+                    <span class="logo-text">AGRIORACLE</span>
+                    <p>By Kalpataru Labs</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#home">HOME</a>
+                    <a href="#modules">MODULES</a>
+                    <a href="#ai-assistant">AI ASSISTANT</a>
+                    <a href="#about">ABOUT</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Kalpataru Labs. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Module Modal -->
+    <div class="modal" id="moduleModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">×</button>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
