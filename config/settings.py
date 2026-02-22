@@ -79,6 +79,14 @@ FERTILIZER_FERTILIZER_ENCODER_PATH = MODEL_DIR / 'fertilizer' / 'fertilizer_enco
 SOIL_MODEL_PATH = MODEL_DIR / 'soil' / 'soil_classifier_model.h5'
 
 # =============================================================================
+# ML Module - Plant Disease Detection (NEW)
+# =============================================================================
+ML_MODEL_DIR = BASE_DIR / 'ml'
+ML_DISEASE_MODEL_PATH = ML_MODEL_DIR / 'mobilenetv2_plant.pth'  # .pth state dict file
+ML_CLASS_NAMES_PATH = ML_MODEL_DIR / 'class_names.json'
+ML_DISEASE_INFO_PATH = ML_MODEL_DIR / 'disease_info.json'
+
+# =============================================================================
 # External API keys (if needed)
 # =============================================================================
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY', '')

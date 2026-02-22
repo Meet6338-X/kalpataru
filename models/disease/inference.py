@@ -1,6 +1,7 @@
 """
 Inference module for plant disease detection.
 Supports 38 disease classes from PlantVillage dataset.
+Uses the ML module with MobileNetV2 model.
 """
 
 from typing import Dict, Any, List, Optional
@@ -8,24 +9,73 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 from pathlib import Path
+import json
 
-from models.disease.cnn_model import (
-    load_pretrained_model,
-    load_pytorch_model,
-    get_disease_info,
-    get_all_disease_classes,
-    DISEASE_CLASSES_38,
-    DISEASE_INFO
+from config.settings import (
+    DISEASE_MODEL_PATH, 
+    IMAGE_SIZE,
+    ML_DISEASE_MODEL_PATH,
+    ML_CLASS_NAMES_PATH,
+    ML_DISEASE_INFO_PATH
 )
-from config.settings import DISEASE_MODEL_PATH, IMAGE_SIZE
 from utils.logger import setup_logger
 from services.explainability import generate_explanation
 
 logger = setup_logger(__name__)
 
-# Global model variable
+# Global model variables
 _model = None
-_model_type = None  # 'keras' or 'pytorch'
+_model_type = None  # 'pytorch_ml', 'keras', 'pytorch', or 'mock'
+_class_names = None
+_disease_info = None
+
+
+def _load_class_names() -> List[str]:
+    """Load class names from JSON file."""
+    global _class_names
+    
+    if _class_names is not None:
+        return _class_names
+    
+    # Try loading from ML module first
+    if ML_CLASS_NAMES_PATH.exists():
+        try:
+            with open(ML_CLASS_NAMES_PATH, 'r') as f:
+                data = json.load(f)
+                _class_names = data.get('classes', [])
+                logger.info(f"Loaded {len(_class_names)} class names from ML module")
+                return _class_names
+        except Exception as e:
+            logger.warning(f"Could not load class names from ML module: {e}")
+    
+    # Fallback to default class names
+    from models.disease.cnn_model import DISEASE_CLASSES_38
+    _class_names = DISEASE_CLASSES_38
+    return _class_names
+
+
+def _load_disease_info() -> Dict[str, Any]:
+    """Load disease information from JSON file."""
+    global _disease_info
+    
+    if _disease_info is not None:
+        return _disease_info
+    
+    # Try loading from ML module first
+    if ML_DISEASE_INFO_PATH.exists():
+        try:
+            with open(ML_DISEASE_INFO_PATH, 'r') as f:
+                data = json.load(f)
+                _disease_info = data.get('diseases', {})
+                logger.info(f"Loaded disease info for {len(_disease_info)} diseases from ML module")
+                return _disease_info
+        except Exception as e:
+            logger.warning(f"Could not load disease info from ML module: {e}")
+    
+    # Fallback to default disease info
+    from models.disease.cnn_model import DISEASE_INFO
+    _disease_info = DISEASE_INFO
+    return _disease_info
 
 
 def get_model():
@@ -35,18 +85,31 @@ def get_model():
     if _model is not None:
         return _model
     
-    # Try loading Keras model first
+    # Try loading from ML module first (new MobileNetV2 model)
+    if ML_DISEASE_MODEL_PATH.exists():
+        try:
+            from ml.model_loader import get_model as ml_get_model
+            _model = ml_get_model(str(ML_DISEASE_MODEL_PATH))
+            _model_type = 'pytorch_ml'
+            logger.info("Disease detection model loaded from ML module (MobileNetV2)")
+            return _model
+        except Exception as e:
+            logger.warning(f"Could not load model from ML module: {e}")
+    
+    # Try loading Keras model
     keras_path = DISEASE_MODEL_PATH
     if keras_path.exists():
+        from models.disease.cnn_model import load_pretrained_model
         _model = load_pretrained_model(str(keras_path), num_classes=38)
         if _model is not None:
             _model_type = 'keras'
             logger.info("Disease detection Keras model loaded successfully")
             return _model
     
-    # Try loading PyTorch model
+    # Try loading PyTorch model from models/disease
     pytorch_path = Path(__file__).parent / 'plant-disease-model.pth'
     if pytorch_path.exists():
+        from models.disease.cnn_model import load_pytorch_model
         _model = load_pytorch_model(str(pytorch_path), num_classes=38)
         if _model is not None:
             _model_type = 'pytorch'
@@ -60,7 +123,7 @@ def get_model():
 
 def preprocess_image(image_data: bytes, target_size: tuple = None) -> np.ndarray:
     """
-    Preprocess image for disease detection.
+    Preprocess image for disease detection (Keras/TensorFlow).
     
     Args:
         image_data: Raw image bytes
@@ -80,7 +143,7 @@ def preprocess_image(image_data: bytes, target_size: tuple = None) -> np.ndarray
 
 def preprocess_image_pytorch(image_data: bytes, target_size: tuple = (224, 224)):
     """
-    Preprocess image for PyTorch model.
+    Preprocess image for PyTorch model using ML module.
     
     Args:
         image_data: Raw image bytes
@@ -90,23 +153,28 @@ def preprocess_image_pytorch(image_data: bytes, target_size: tuple = (224, 224))
         Preprocessed tensor
     """
     try:
-        import torch
-        from torchvision import transforms
-        
-        image = Image.open(BytesIO(image_data)).convert('RGB')
-        
-        transform = transforms.Compose([
-            transforms.Resize(target_size),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], 
-                               std=[0.229, 0.224, 0.225])
-        ])
-        
-        return transform(image).unsqueeze(0)
-        
+        from ml.preprocess import preprocess_image as ml_preprocess
+        return ml_preprocess(image_data)
     except ImportError:
-        logger.warning("PyTorch not available for preprocessing")
-        return None
+        # Fallback to manual preprocessing
+        try:
+            import torch
+            from torchvision import transforms
+            
+            image = Image.open(BytesIO(image_data)).convert('RGB')
+            
+            transform = transforms.Compose([
+                transforms.Resize(target_size),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+                                   std=[0.229, 0.224, 0.225])
+            ])
+            
+            return transform(image).unsqueeze(0)
+            
+        except ImportError:
+            logger.warning("PyTorch not available for preprocessing")
+            return None
 
 
 def predict_disease(image_file) -> Dict[str, Any]:
@@ -124,11 +192,43 @@ def predict_disease(image_file) -> Dict[str, Any]:
     # Read image
     image_data = image_file.read()
     
-    if model is not None and _model_type == 'keras':
+    if model is not None and _model_type == 'pytorch_ml':
+        return _predict_pytorch_ml(model, image_data)
+    elif model is not None and _model_type == 'keras':
         return _predict_keras(model, image_data)
     elif model is not None and _model_type == 'pytorch':
         return _predict_pytorch(model, image_data)
     else:
+        return _predict_mock(image_data)
+
+
+def _predict_pytorch_ml(model, image_data: bytes) -> Dict[str, Any]:
+    """Make prediction using ML module PyTorch model."""
+    try:
+        import torch
+        
+        # Preprocess using ML module
+        processed_image = preprocess_image_pytorch(image_data)
+        
+        # Get probabilities
+        probabilities = model.get_probabilities(processed_image)
+        
+        # Convert to numpy
+        if isinstance(probabilities, torch.Tensor):
+            probabilities = probabilities.cpu().numpy()
+        
+        probabilities = probabilities[0]
+        predicted_class = np.argmax(probabilities)
+        confidence = float(probabilities[predicted_class])
+        
+        # Get class name
+        class_names = _load_class_names()
+        disease = class_names[predicted_class] if predicted_class < len(class_names) else f"Unknown_{predicted_class}"
+        
+        return _build_result(disease, confidence, probabilities)
+        
+    except Exception as e:
+        logger.error(f"ML PyTorch prediction error: {str(e)}")
         return _predict_mock(image_data)
 
 
@@ -140,7 +240,8 @@ def _predict_keras(model, image_data: bytes) -> Dict[str, Any]:
         predicted_class = np.argmax(predictions[0])
         confidence = float(predictions[0][predicted_class])
         
-        disease = DISEASE_CLASSES_38[predicted_class]
+        class_names = _load_class_names()
+        disease = class_names[predicted_class] if predicted_class < len(class_names) else f"Unknown_{predicted_class}"
         
         return _build_result(disease, confidence, predictions[0])
         
@@ -162,7 +263,8 @@ def _predict_pytorch(model, image_data: bytes) -> Dict[str, Any]:
             predicted_class = torch.argmax(probabilities, dim=1).item()
             confidence = probabilities[0][predicted_class].item()
         
-        disease = DISEASE_CLASSES_38[predicted_class]
+        class_names = _load_class_names()
+        disease = class_names[predicted_class] if predicted_class < len(class_names) else f"Unknown_{predicted_class}"
         
         # Convert to numpy for consistent interface
         all_probs = probabilities[0].numpy()
@@ -220,19 +322,22 @@ def _build_result(disease: str, confidence: float,
         'disease': disease,
         'confidence': round(confidence, 4),
         'is_healthy': 'healthy' in disease.lower(),
-        'description': disease_info['description'],
-        'treatment': disease_info['treatment'],
-        'prevention': disease_info['prevention'],
+        'severity': disease_info.get('severity', 'Unknown'),
+        'symptoms': disease_info.get('symptoms', 'Information not available'),
+        'description': disease_info.get('description', 'Information not available for this disease.'),
+        'treatment': disease_info.get('treatment', 'Consult local agricultural expert.'),
+        'prevention': disease_info.get('prevention', 'Follow general plant care practices.'),
         'recommendations': get_recommendations(disease),
         'model_type': _model_type if _model_type else 'mock'
     }
     
     # Add top 5 predictions if available
     if all_probs is not None:
+        class_names = _load_class_names()
         top_indices = np.argsort(all_probs)[-5:][::-1]
         result['top_predictions'] = [
             {
-                'disease': DISEASE_CLASSES_38[idx],
+                'disease': class_names[idx] if idx < len(class_names) else f"Unknown_{idx}",
                 'probability': round(float(all_probs[idx]), 4)
             }
             for idx in top_indices
@@ -242,6 +347,26 @@ def _build_result(disease: str, confidence: float,
     result['explanation'] = generate_explanation(disease, confidence)
     
     return result
+
+
+def get_disease_info(disease_name: str) -> Dict[str, str]:
+    """
+    Get information about a specific disease.
+    
+    Args:
+        disease_name: Name of the disease
+        
+    Returns:
+        Dictionary with disease information
+    """
+    disease_info = _load_disease_info()
+    return disease_info.get(disease_name, {
+        'description': 'Information not available for this disease.',
+        'treatment': 'Consult local agricultural expert.',
+        'prevention': 'Follow general plant care practices.',
+        'severity': 'Unknown',
+        'symptoms': 'Information not available'
+    })
 
 
 def get_recommendations(disease: str) -> List[str]:
@@ -299,7 +424,7 @@ def get_recommendations(disease: str) -> List[str]:
             'Water at base of plants',
             'Rotate crops yearly'
         ],
-        'Tomato___Spider_mites Two-spotted_spider_mite': [
+        'Tomato___Spider_mites_(Two-spotted_spider_mite)': [
             'Spray plants with water to dislodge mites',
             'Apply insecticidal soap or neem oil',
             'Introduce predatory mites',
@@ -346,6 +471,12 @@ def get_recommendations(disease: str) -> List[str]:
             'Plant resistant hybrids',
             'Avoid late planting',
             'Rotate crops'
+        ],
+        'Corn___Common_rust_': [
+            'Apply fungicide if infection is severe',
+            'Plant resistant hybrids',
+            'Avoid late planting',
+            'Rotate crops'
         ]
     }
     
@@ -377,12 +508,14 @@ def get_supported_diseases() -> List[Dict[str, str]]:
     Returns:
         List of dictionaries with disease names and descriptions
     """
+    class_names = _load_class_names()
     diseases = []
-    for disease_name in DISEASE_CLASSES_38:
+    for disease_name in class_names:
         info = get_disease_info(disease_name)
         diseases.append({
             'name': disease_name,
-            'description': info['description'],
-            'is_healthy': 'healthy' in disease_name.lower()
+            'description': info.get('description', 'Information not available'),
+            'is_healthy': 'healthy' in disease_name.lower(),
+            'severity': info.get('severity', 'Unknown')
         })
     return diseases

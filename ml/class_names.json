@@ -1,0 +1,101 @@
+{
+  "classes": [
+    "Apple___Apple_scab",
+    "Apple___Black_rot",
+    "Apple___Cedar_apple_rust",
+    "Apple___healthy",
+    "Blueberry___healthy",
+    "Cherry___Powdery_mildew",
+    "Cherry___healthy",
+    "Corn___Cercospora_leaf_spot",
+    "Corn___Common_rust_",
+    "Corn___Northern_Leaf_Blight",
+    "Corn___healthy",
+    "Grape___Black_rot",
+    "Grape___Esca_(Black_Measles)",
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
+    "Grape___healthy",
+    "Orange___Haunglongbing_(Citrus_greening)",
+    "Peach___Bacterial_spot",
+    "Peach___healthy",
+    "Pepper,_bell___Bacterial_spot",
+    "Pepper,_bell___healthy",
+    "Potato___Early_blight",
+    "Potato___Late_blight",
+    "Potato___healthy",
+    "Raspberry___healthy",
+    "Soybean___healthy",
+    "Squash___Powdery_mildew",
+    "Strawberry___Leaf_scorch",
+    "Strawberry___healthy",
+    "Tomato___Bacterial_spot",
+    "Tomato___Early_blight",
+    "Tomato___Late_blight",
+    "Tomato___Leaf_Mold",
+    "Tomato___Septoria_leaf_spot",
+    "Tomato___Spider_mites_(Two-spotted_spider_mite)",
+    "Tomato___Target_Spot",
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+    "Tomato___Tomato_mosaic_virus",
+    "Tomato___healthy"
+  ],
+  "description": "38 plant disease classes from PlantVillage dataset",
+  "plants": [
+    {
+      "name": "Apple",
+      "classes": ["Apple___Apple_scab", "Apple___Black_rot", "Apple___Cedar_apple_rust", "Apple___healthy"]
+    },
+    {
+      "name": "Blueberry",
+      "classes": ["Blueberry___healthy"]
+    },
+    {
+      "name": "Cherry",
+      "classes": ["Cherry___Powdery_mildew", "Cherry___healthy"]
+    },
+    {
+      "name": "Corn",
+      "classes": ["Corn___Cercospora_leaf_spot", "Corn___Common_rust_", "Corn___Northern_Leaf_Blight", "Corn___healthy"]
+    },
+    {
+      "name": "Grape",
+      "classes": ["Grape___Black_rot", "Grape___Esca_(Black_Measles)", "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)", "Grape___healthy"]
+    },
+    {
+      "name": "Orange",
+      "classes": ["Orange___Haunglongbing_(Citrus_greening)"]
+    },
+    {
+      "name": "Peach",
+      "classes": ["Peach___Bacterial_spot", "Peach___healthy"]
+    },
+    {
+      "name": "Pepper",
+      "classes": ["Pepper,_bell___Bacterial_spot", "Pepper,_bell___healthy"]
+    },
+    {
+      "name": "Potato",
+      "classes": ["Potato___Early_blight", "Potato___Late_blight", "Potato___healthy"]
+    },
+    {
+      "name": "Raspberry",
+      "classes": ["Raspberry___healthy"]
+    },
+    {
+      "name": "Soybean",
+      "classes": ["Soybean___healthy"]
+    },
+    {
+      "name": "Squash",
+      "classes": ["Squash___Powdery_mildew"]
+    },
+    {
+      "name": "Strawberry",
+      "classes": ["Strawberry___Leaf_scorch", "Strawberry___healthy"]
+    },
+    {
+      "name": "Tomato",
+      "classes": ["Tomato___Bacterial_spot", "Tomato___Early_blight", "Tomato___Late_blight", "Tomato___Leaf_Mold", "Tomato___Septoria_leaf_spot", "Tomato___Spider_mites_(Two-spotted_spider_mite)", "Tomato___Target_Spot", "Tomato___Tomato_Yellow_Leaf_Curl_Virus", "Tomato___Tomato_mosaic_virus", "Tomato___healthy"]
+    }
+  ]
+}

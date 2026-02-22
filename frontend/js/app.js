@@ -419,6 +419,64 @@ const moduleTemplates = {
             <div id="weatherResult"></div>
         `
     },
+    'mandi': {
+        title: 'MANDI PRICES',
+        icon: '📊',
+        content: `
+            <form id="mandiForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">STATE</label>
+                        <select class="form-select" id="mandiState">
+                            <option value="">All States</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="West Bengal">West Bengal</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">DISTRICT</label>
+                        <select class="form-select" id="mandiDistrict">
+                            <option value="">All Districts</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">COMMODITY</label>
+                        <select class="form-select" id="mandiCommodity">
+                            <option value="">All Commodities</option>
+                            <option value="Tomato">Tomato</option>
+                            <option value="Potato">Potato</option>
+                            <option value="Onion">Onion</option>
+                            <option value="Wheat">Wheat</option>
+                            <option value="Rice">Rice</option>
+                            <option value="Maize">Maize</option>
+                            <option value="Soybean">Soybean</option>
+                            <option value="Cotton">Cotton</option>
+                            <option value="Sugarcane">Sugarcane</option>
+                            <option value="Groundnut">Groundnut</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">MARKET</label>
+                        <select class="form-select" id="mandiMarket">
+                            <option value="">All Markets</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">GET PRICES</button>
+            </form>
+            <div id="mandiResult"></div>
+        `
+    },
     'yield': {
         title: 'YIELD PREDICTION',
         icon: '📈',
@@ -547,6 +605,78 @@ const moduleTemplates = {
                 <button type="submit" class="btn btn-primary">GET RECOMMENDATION</button>
             </form>
             <div id="irrigationResult"></div>
+        `
+    },
+    'rental': {
+        title: 'EQUIPMENT RENTAL',
+        icon: '🚜',
+        content: `
+            <div class="rental-categories">
+                <div class="category-grid">
+                    <button class="category-btn active" data-category="tractors">
+                        <span class="cat-icon">🚜</span>
+                        <span>Tractors</span>
+                    </button>
+                    <button class="category-btn" data-category="drones">
+                        <span class="cat-icon">🛸</span>
+                        <span>Drones</span>
+                    </button>
+                    <button class="category-btn" data-category="seeds">
+                        <span class="cat-icon">🌱</span>
+                        <span>Seeds</span>
+                    </button>
+                    <button class="category-btn" data-category="fertilizers">
+                        <span class="cat-icon">🧪</span>
+                        <span>Fertilizers</span>
+                    </button>
+                    <button class="category-btn" data-category="pesticides">
+                        <span class="cat-icon">💊</span>
+                        <span>Pesticides</span>
+                    </button>
+                    <button class="category-btn" data-category="labor">
+                        <span class="cat-icon">👨‍🌾</span>
+                        <span>Farm Labor</span>
+                    </button>
+                </div>
+            </div>
+            <form id="rentalForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">EQUIPMENT TYPE</label>
+                        <select class="form-select" id="rentalType">
+                            <option value="">All Types</option>
+                            <option value="Tractor">Tractor</option>
+                            <option value="Harvester">Harvester</option>
+                            <option value="Sprayer">Sprayer</option>
+                            <option value="Seed Drill">Seed Drill</option>
+                            <option value="Thresher">Thresher</option>
+                            <option value="Irrigation Pump">Irrigation Pump</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">LOCATION</label>
+                        <input type="text" class="form-input" id="rentalLocation" placeholder="Enter district or city">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">RENTAL TYPE</label>
+                        <select class="form-select" id="rentalRentType">
+                            <option value="">Any</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="seasonal">Seasonal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">MAX BUDGET (₹)</label>
+                        <input type="number" class="form-input" id="rentalBudget" placeholder="Maximum price">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">SEARCH EQUIPMENT</button>
+            </form>
+            <div id="rentalResult"></div>
         `
     }
 };
@@ -695,6 +825,90 @@ function initModuleForms() {
         });
     }
     
+    // Mandi Prices form
+    const mandiForm = document.getElementById('mandiForm');
+    if (mandiForm) {
+        mandiForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const state = document.getElementById('mandiState').value;
+            const district = document.getElementById('mandiDistrict').value;
+            const commodity = document.getElementById('mandiCommodity').value;
+            const market = document.getElementById('mandiMarket').value;
+            
+            let url = `${API_BASE}/mandi/prices?`;
+            const params = new URLSearchParams();
+            if (state) params.append('state', state);
+            if (district) params.append('district', district);
+            if (commodity) params.append('commodity', commodity);
+            if (market) params.append('market', market);
+            url += params.toString();
+            
+            showLoading('mandiResult');
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                showMandiResult(data);
+            } catch (error) {
+                showError('mandiResult', error);
+            }
+        });
+        
+        // Populate districts when state changes
+        const mandiState = document.getElementById('mandiState');
+        if (mandiState) {
+            mandiState.addEventListener('change', async () => {
+                const state = mandiState.value;
+                const districtSelect = document.getElementById('mandiDistrict');
+                districtSelect.innerHTML = '<option value="">All Districts</option>';
+                
+                if (state) {
+                    try {
+                        const response = await fetch(`${API_BASE}/mandi/districts?state=${encodeURIComponent(state)}`);
+                        const data = await response.json();
+                        if (data.districts) {
+                            data.districts.forEach(d => {
+                                const option = document.createElement('option');
+                                option.value = d;
+                                option.textContent = d;
+                                districtSelect.appendChild(option);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error fetching districts:', error);
+                    }
+                }
+            });
+        }
+        
+        // Populate markets when district changes
+        const mandiDistrict = document.getElementById('mandiDistrict');
+        if (mandiDistrict) {
+            mandiDistrict.addEventListener('change', async () => {
+                const district = mandiDistrict.value;
+                const marketSelect = document.getElementById('mandiMarket');
+                marketSelect.innerHTML = '<option value="">All Markets</option>';
+                
+                if (district) {
+                    try {
+                        const response = await fetch(`${API_BASE}/mandi/markets?district=${encodeURIComponent(district)}`);
+                        const data = await response.json();
+                        if (data.markets) {
+                            data.markets.forEach(m => {
+                                const option = document.createElement('option');
+                                option.value = m;
+                                option.textContent = m;
+                                marketSelect.appendChild(option);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error fetching markets:', error);
+                    }
+                }
+            });
+        }
+    }
+    
     // Yield form
     const yieldForm = document.getElementById('yieldForm');
     if (yieldForm) {
@@ -799,6 +1013,88 @@ function initModuleForms() {
                 showIrrigationResult(data);
             } catch (error) {
                 showError('irrigationResult', error);
+            }
+        });
+    }
+    
+    // Rental form
+    const rentalForm = document.getElementById('rentalForm');
+    if (rentalForm) {
+        // Category button handling
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update equipment types based on category
+                const typeSelect = document.getElementById('rentalType');
+                const category = btn.dataset.category;
+                
+                let options = '<option value="">All Types</option>';
+                
+                if (category === 'tractors') {
+                    options += '<option value="Tractor">Tractor</option>';
+                    options += '<option value="Harvester">Harvester</option>';
+                    options += '<option value="Rotavator">Rotavator</option>';
+                    options += '<option value="Cultivator">Cultivator</option>';
+                } else if (category === 'drones') {
+                    options += '<option value="Agricultural Drone">Agricultural Drone</option>';
+                    options += '<option value="Spraying Drone">Spraying Drone</option>';
+                    options += '<option value="Survey Drone">Survey Drone</option>';
+                } else if (category === 'seeds') {
+                    options += '<option value="Rice Seeds">Rice Seeds</option>';
+                    options += '<option value="Wheat Seeds">Wheat Seeds</option>';
+                    options += '<option value="Maize Seeds">Maize Seeds</option>';
+                    options += '<option value="Vegetable Seeds">Vegetable Seeds</option>';
+                    options += '<option value="Cotton Seeds">Cotton Seeds</option>';
+                } else if (category === 'fertilizers') {
+                    options += '<option value="Urea">Urea</option>';
+                    options += '<option value="DAP">DAP</option>';
+                    options += '<option value="NPK">NPK</option>';
+                    options += '<option value="Vermicompost">Vermicompost</option>';
+                    options += '<option value="Organic Fertilizer">Organic Fertilizer</option>';
+                } else if (category === 'pesticides') {
+                    options += '<option value="Insecticide">Insecticide</option>';
+                    options += '<option value="Fungicide">Fungicide</option>';
+                    options += '<option value="Herbicide">Herbicide</option>';
+                    options += '<option value="Pesticide">Pesticide</option>';
+                } else if (category === 'labor') {
+                    options += '<option value="Farm Worker">Farm Worker</option>';
+                    options += '<option value="Skilled Labor">Skilled Labor</option>';
+                    options += '<option value="Machine Operator">Machine Operator</option>';
+                }
+                
+                typeSelect.innerHTML = options;
+            });
+        });
+        
+        rentalForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const type = document.getElementById('rentalType').value;
+            const location = document.getElementById('rentalLocation').value;
+            const rentType = document.getElementById('rentalRentType').value;
+            const budget = document.getElementById('rentalBudget').value;
+            
+            // Get active category
+            const activeCategory = document.querySelector('.category-btn.active')?.dataset.category || 'tractors';
+            
+            let url = `${API_BASE}/rentals/equipment?`;
+            const params = new URLSearchParams();
+            if (type) params.append('equipment_type', type);
+            if (location) params.append('location', location);
+            if (rentType) params.append('rental_type', rentType);
+            if (budget) params.append('max_price', budget);
+            params.append('category', activeCategory);
+            url += params.toString();
+            
+            showLoading('rentalResult');
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                showRentalResult(data);
+            } catch (error) {
+                showError('rentalResult', error);
             }
         });
     }
@@ -927,6 +1223,42 @@ function showWeatherResult(data) {
     }
 }
 
+function showMandiResult(data) {
+    // Handle different response formats - both from external API and fallback
+    const records = data.records || (data.data && data.data.records) || [];
+    const status = data.status || (data.success ? 'success' : 'error');
+    
+    if (status === 'success' && records.length > 0) {
+        let html = `<div class="result-card"><h3 class="result-title">Market Prices (${records.length} records)</h3>`;
+        if (data.source === 'fallback') {
+            html += `<p class="result-text" style="color: #666; font-size: 0.75rem; margin-bottom: 1rem;">📊 Sample data (live API unavailable)</p>`;
+        }
+        html += `<div class="table-container"><table class="result-table"><thead><tr>`;
+        html += `<th>Market</th><th>Commodity</th><th>Variety</th><th>Min Price</th><th>Max Price</th><th>Modal Price</th>`;
+        html += `</tr></thead><tbody>`;
+        
+        records.forEach(record => {
+            html += `<tr>`;
+            html += `<td>${record.market || 'N/A'}</td>`;
+            html += `<td>${record.commodity || 'N/A'}</td>`;
+            html += `<td>${record.variety || 'N/A'}</td>`;
+            html += `<td>₹${record.min_price || 'N/A'}</td>`;
+            html += `<td>₹${record.max_price || 'N/A'}</td>`;
+            html += `<td>₹${record.modal_price || 'N/A'}</td>`;
+            html += `</tr>`;
+        });
+        
+        html += `</tbody></table></div></div>`;
+        document.getElementById('mandiResult').innerHTML = html;
+    } else {
+        document.getElementById('mandiResult').innerHTML = `
+            <div class="result-card">
+                <p class="result-text">No price data found for the selected filters.</p>
+            </div>
+        `;
+    }
+}
+
 function showYieldResult(data) {
     if (data.success) {
         const result = data.data;
@@ -1025,6 +1357,46 @@ function showIrrigationResult(data) {
         `;
     } else {
         showError('irrigationResult', new Error(data.message));
+    }
+}
+
+function showRentalResult(data) {
+    if (data.success && data.data && data.data.records) {
+        const records = data.data.records;
+        if (records.length === 0) {
+            document.getElementById('rentalResult').innerHTML = `
+                <div class="result-card">
+                    <p class="result-text">No equipment found. Try different filters.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = `<div class="result-card"><h3 class="result-title">Available Equipment (${records.length})</h3>`;
+        html += `<div class="rental-grid">`;
+        
+        records.forEach(item => {
+            html += `<div class="rental-card">`;
+            html += `<div class="rental-header">`;
+            html += `<span class="rental-category">${item.category || 'Equipment'}</span>`;
+            html += `</div>`;
+            html += `<h4 class="rental-title">${item.equipment_type || item.name || 'Equipment'}</h4>`;
+            html += `<p class="rental-location">📍 ${item.location || 'N/A'}</p>`;
+            html += `<div class="rental-details">`;
+            html += `<span class="rental-price">₹${item.price_per_day || item.price || 'N/A'}/day</span>`;
+            html += `<span class="rental-type">${item.rental_type || 'Daily'}</span>`;
+            html += `</div>`;
+            if (item.owner_name) {
+                html += `<p class="rental-owner">👤 ${item.owner_name}</p>`;
+            }
+            html += `<button class="btn btn-primary btn-small">CONTACT OWNER</button>`;
+            html += `</div>`;
+        });
+        
+        html += `</div></div>`;
+        document.getElementById('rentalResult').innerHTML = html;
+    } else {
+        showError('rentalResult', new Error(data.message || 'Failed to fetch equipment'));
     }
 }
 

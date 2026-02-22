@@ -165,10 +165,20 @@ Rental Categories:
 │   ├── Pumps
 │   ├── Pipes
 │   └── Sprinklers
-└── Tools
-    ├── Hand Tools
-    ├── Power Tools
-    └── Safety Equipment
+├── Tools
+│   ├── Hand Tools
+│   ├── Power Tools
+│   └── Safety Equipment
+├── Agrochemicals
+│   ├── Fertilizers (organic, chemical)
+│   ├── Pesticides (insecticides, fungicides, herbicides)
+│   ├── Growth Promoters
+│   └── Biopesticides
+└── Farm Labor
+    ├── Skilled Workers (machine operators, irrigation specialists)
+    ├── Unskilled Workers (harvesting, planting)
+    ├── Specialized Services (grafting, pruning)
+    └── Equipment Operators (drone pilots, tractor operators)
 ```
 
 ### 2.3 Enhanced Data Models
@@ -229,6 +239,75 @@ class EquipmentAvailabilityException:
     start_date: date
     end_date: date
     notes: str
+
+# New: Agrochemical Listing (Fertilizers/Pesticides)
+class AgrochemicalListing:
+    id: int
+    seller_id: int
+    product_name: str
+    category: str              # FERTILIZER, PESTICIDE, GROWTH_PROMOTER
+    sub_category: str          # Organic, Chemical, Insecticide, etc.
+    brand: str
+    active_ingredient: str     # For pesticides
+    npk_ratio: str             # For fertilizers e.g., "10-26-26"
+    quantity_available: float
+    unit: str                  # KG, LITER, BAG
+    price_per_unit: float
+    application_method: str    # SOIL, FOLIAR, DRIP
+    target_crops: str          # JSON array of suitable crops
+    target_pests: str          # JSON array for pesticides
+    safety_interval_days: int  # Days before harvest
+    expiry_date: date
+    certification_number: str
+    is_organic: bool
+    handling_instructions: str
+    safety_equipment_required: str
+    image_url: str
+    is_verified: bool
+    created_at: datetime
+    updated_at: datetime
+
+# New: Farm Labor Listing
+class FarmLaborListing:
+    id: int
+    worker_id: int             # Reference to User
+    worker_type: str           # SKILLED, UNSKILLED, SPECIALIZED
+    skills: str                # JSON array of skills
+    certifications: str        # JSON array of certifications
+    experience_years: int
+    daily_wage: float
+    hourly_wage: float
+    availability_start: date
+    availability_end: date
+    preferred_location: str
+    languages_known: str       # JSON array
+    accommodation_required: bool
+    minimum_engagement_days: int
+    profile_photo: str
+    id_proof_url: str          # Verification document
+    is_verified: bool
+    rating: float
+    total_jobs: int
+    created_at: datetime
+    updated_at: datetime
+
+# New: Labor Booking
+class LaborBooking:
+    id: int
+    labor_listing_id: int
+    farmer_id: int
+    start_date: date
+    end_date: date
+    work_type: str             # PLANTING, HARVESTING, SPRAYING, etc.
+    daily_hours: int
+    total_amount: float
+    status: str                # PENDING, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED
+    payment_status: str
+    farmer_review: str
+    worker_review: str
+    farmer_rating: int
+    worker_rating: int
+    created_at: datetime
 ```
 
 ### 2.4 API Endpoints Design
@@ -249,6 +328,19 @@ class EquipmentAvailabilityException:
 | GET | `/api/v1/rentals/equipment/<id>/reviews` | Get equipment reviews |
 | GET | `/api/v1/rentals/my-equipment` | Get owner's equipment list |
 | GET | `/api/v1/rentals/dashboard` | Owner dashboard stats |
+| **Agrochemicals** | | |
+| GET | `/api/v1/rentals/agrochemicals` | List agrochemicals with filters |
+| GET | `/api/v1/rentals/agrochemicals/<id>` | Get agrochemical details |
+| POST | `/api/v1/rentals/agrochemicals` | List agrochemical for sale/rent |
+| GET | `/api/v1/rentals/agrochemicals/categories` | Get agrochemical categories |
+| **Farm Labor** | | |
+| GET | `/api/v1/rentals/labor` | List available workers |
+| GET | `/api/v1/rentals/labor/<id>` | Get worker profile |
+| POST | `/api/v1/rentals/labor` | Register as farm worker |
+| POST | `/api/v1/rentals/labor/bookings` | Book a worker |
+| GET | `/api/v1/rentals/labor/bookings` | Get labor bookings |
+| PUT | `/api/v1/rentals/labor/bookings/<id>` | Update labor booking |
+| GET | `/api/v1/rentals/labor/skills` | List available skills |
 
 ### 2.5 Category-Specific Features
 
@@ -275,6 +367,37 @@ class EquipmentAvailabilityException:
 - Expiry date
 - Bulk pricing options
 - Minimum order quantity
+
+#### Fertilizers
+- Type: Organic, Chemical, Bio-fertilizers
+- NPK ratio specification
+- Quantity available (kg/liters)
+- Application method (soil, foliar, drip)
+- Crop suitability list
+- Organic certification (if applicable)
+- Expiry date
+- Bulk pricing tiers
+
+#### Pesticides
+- Type: Insecticide, Fungicide, Herbicide, Rodenticide
+- Active ingredient percentage
+- Target pests/diseases
+- Application dosage guidelines
+- Safety interval before harvest
+- Quantity available (liters/kg)
+- Safety equipment required
+- Handling instructions
+
+#### Farm Labor
+- Worker type: Skilled, Unskilled, Specialized
+- Skills/certifications (tractor operation, grafting, etc.)
+- Daily/hourly wage rate
+- Availability calendar
+- Experience years
+- Languages known
+- Location preference
+- Accommodation required (yes/no)
+- Minimum engagement period
 
 ---
 
@@ -421,8 +544,18 @@ RENTAL_CANCELLATION_HOURS=24
 - `AgriTech/backend/tasks/mandi_tasks.py`
 - `AgriTech/backend/models/equipment_review.py`
 - `AgriTech/backend/services/equipment_review_service.py`
+- `AgriTech/backend/models/agrochemical.py`
+- `AgriTech/backend/models/farm_labor.py`
+- `AgriTech/backend/services/agrochemical_service.py`
+- `AgriTech/backend/services/farm_labor_service.py`
+- `AgriTech/backend/api/v1/agrochemicals.py`
+- `AgriTech/backend/api/v1/farm_labor.py`
+- `AgriTech/backend/schemas/agrochemical_schema.py`
+- `AgriTech/backend/schemas/farm_labor_schema.py`
 - `AgriTech/mandi_prices.html`
 - `AgriTech/rental_marketplace.html`
+- `AgriTech/agrochemicals.html`
+- `AgriTech/farm_labor.html`
 - `AgriTech/mandi.css`
 - `AgriTech/rental.css`
 - `AgriTech/mandi.js`

@@ -7,6 +7,8 @@ yield prediction, price forecasting, and crop recommendations.
 from flask import Flask, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from api.routes import api_bp
+from api.mandi import mandi_bp
+from api.rentals import rentals_bp
 from utils.logger import setup_logger
 import os
 
@@ -21,6 +23,8 @@ CORS(app)
 
 # Register blueprints
 app.register_blueprint(api_bp, url_prefix='/api')
+app.register_blueprint(mandi_bp)
+app.register_blueprint(rentals_bp)
 
 @app.route('/')
 def index():

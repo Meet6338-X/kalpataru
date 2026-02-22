@@ -1260,6 +1260,169 @@ h1, h2, h3, h4 {
     opacity: 0.7;
 }
 
+.result-text {
+    color: var(--white);
+    text-align: center;
+    padding: 1rem;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.result-table th,
+.result-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.875rem;
+}
+
+.result-table th {
+    background: var(--forest);
+    color: var(--white);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+}
+
+.result-table td {
+    color: var(--forest);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.result-table tr:last-child td {
+    border-bottom: none;
+}
+
+.result-table tr:hover td {
+    background: rgba(0,0,0,0.02);
+}
+
+/* Rental Module */
+.rental-categories {
+    margin-bottom: 1.5rem;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+
+.category-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0.5rem;
+    background: var(--white);
+    border: 2px solid var(--forest);
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.category-btn:hover,
+.category-btn.active {
+    background: var(--forest);
+    color: var(--white);
+}
+
+.category-btn .cat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.category-btn span:last-child {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.rental-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.rental-card {
+    background: var(--white);
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.rental-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.rental-category {
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--forest);
+    background: rgba(34, 85, 51, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.rental-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--forest);
+    margin: 0.5rem 0;
+}
+
+.rental-location {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 0.75rem;
+}
+
+.rental-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.rental-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--forest);
+}
+
+.rental-type {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.rental-owner {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 0.75rem;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    width: 100%;
+}
+
 /* Loading */
 .loading {
     display: flex;
@@ -1362,5 +1525,114 @@ h1, h2, h3, h4 {
     
     .chat-container {
         border-radius: 3rem;
+    }
+}
+
+/* ============================================
+   FarmLink Section
+   ============================================ */
+.farmlink-section {
+    padding: var(--section-padding) 1rem;
+    background: linear-gradient(135deg, var(--forest) 0%, #027a4e 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.farmlink-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+}
+
+.farmlink-section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.farmlink-section .section-title {
+    color: var(--white);
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.farmlink-section .section-subtitle {
+    color: var(--sage);
+    font-size: 1.25rem;
+    text-align: center;
+    margin-bottom: 3rem;
+    font-weight: 500;
+}
+
+.farmlink-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    text-align: center;
+    transition: all 0.3s var(--easing);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.feature-card .feature-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    color: var(--white);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.feature-card p {
+    color: var(--cream);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.farmlink-cta {
+    text-align: center;
+}
+
+.farmlink-cta .btn {
+    padding: 1.25rem 3rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Responsive FarmLink */
+@media (max-width: 968px) {
+    .farmlink-features {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .farmlink-section .section-title {
+        font-size: 2.5rem;
     }
 }

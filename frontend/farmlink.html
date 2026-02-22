@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmLink — Kalpataru Labs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Google Translate -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,bn,ta,te,mr,gu,kn,ml,pa,or,as,ur',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <style>
+        .fl-hero {
+            background: linear-gradient(135deg, var(--forest) 0%, #027a4e 100%);
+            padding: 6rem 2rem;
+            text-align: center;
+            color: white;
+        }
+        .fl-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+        .fl-hero p {
+            font-size: 1.25rem;
+            color: var(--sage);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+        .fl-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .fl-tab {
+            padding: 0.75rem 2rem;
+            border: 2px solid var(--forest);
+            background: transparent;
+            color: var(--forest);
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .fl-tab.active, .fl-tab:hover {
+            background: var(--forest);
+            color: white;
+        }
+        .fl-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        .fl-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .fl-filter {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            background: white;
+        }
+        .fl-filter select, .fl-filter input {
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            color: var(--forest);
+        }
+        .fl-listings {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .fl-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .fl-card:hover {
+            transform: translateY(-5px);
+        }
+        .fl-card-img {
+            height: 150px;
+            background: var(--olive);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        .fl-card-body {
+            padding: 1.5rem;
+        }
+        .fl-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--forest);
+        }
+        .fl-card-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .fl-card-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--forest);
+            margin-bottom: 1rem;
+        }
+        .fl-card-price span {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 400;
+        }
+        .fl-card-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--forest);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .fl-card-btn:hover {
+            background: #013d24;
+        }
+        .fl-create-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--forest);
+            color: white;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+        .fl-create-btn:hover {
+            transform: scale(1.1);
+        }
+        .fl-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .fl-modal.active {
+            display: flex;
+        }
+        .fl-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .fl-form-group {
+            margin-bottom: 1.5rem;
+        }
+        .fl-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--forest);
+        }
+        .fl-form-group input, .fl-form-group textarea, .fl-form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        .fl-form-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .fl-form-actions button {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .fl-submit-btn {
+            background: var(--forest);
+            color: white;
+            border: none;
+        }
+        .fl-cancel-btn {
+            background: transparent;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+        .fl-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--forest);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+        .fl-back:hover {
+            text-decoration: underline;
+        }
+        .fl-loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        .fl-empty {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        /* Messaging Styles */
+        .fl-messages-tab {
+            padding: 1rem;
+        }
+        .fl-conversation-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #eee;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .fl-conversation-item:hover {
+            background: var(--olive);
+            border-color: var(--moss);
+        }
+        .fl-conv-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--sage);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+        .fl-conv-info {
+            flex: 1;
+        }
+        .fl-conv-title {
+            font-weight: 600;
+            color: var(--forest);
+            margin-bottom: 0.25rem;
+        }
+        .fl-conv-preview {
+            font-size: 0.85rem;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+        }
+        .fl-conv-meta {
+            text-align: right;
+        }
+        .fl-conv-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+        .fl-conv-unread {
+            background: var(--forest);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+            margin-left: auto;
+        }
+        /* Chat Modal */
+        .fl-chat-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+        .fl-chat-modal.active {
+            display: flex;
+        }
+        .fl-chat-container {
+            background: white;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .fl-chat-header {
+            padding: 1rem;
+            background: var(--forest);
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        .fl-chat-header h3 {
+            margin: 0;
+            flex: 1;
+        }
+        .fl-chat-back {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+        .fl-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .fl-chat-message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            position: relative;
+        }
+        .fl-chat-message.mine {
+            background: var(--forest);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .fl-chat-message.theirs {
+            background: #f0f0f0;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .fl-chat-message .time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+            display: block;
+        }
+        .fl-chat-input {
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .fl-chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 2rem;
+            font-size: 1rem;
+        }
+        .fl-chat-input button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--forest);
+            color: white;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+        .fl-contact-btn {
+            background: #17a2b8;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" style="position: relative; background: var(--forest);">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="logo-icon">🌾</span>
+                <span class="logo-text">FARMLINK</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">HOME</a>
+                <a href="index.html#farmlink" class="nav-link">BACK TO HOME</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="fl-hero">
+        <h1>🔗 FarmLink</h1>
+        <p>Farm-to-Market Direct Trade Platform — Connect directly with buyers, get better prices, no middlemen.</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="fl-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <a href="index.html#farmlink" class="fl-back">← Back to AgriOracle</a>
+            <div id="google_translate_element"></div>
+        </div>
+        
+        <div class="fl-tabs">
+            <button class="fl-tab active" data-tab="browse">Browse Listings</button>
+            <button class="fl-tab" data-tab="my-listings">My Listings</button>
+            <button class="fl-tab" data-tab="my-offers">My Offers</button>
+            <button class="fl-tab" data-tab="deals">Deals</button>
+            <button class="fl-tab" data-tab="messages">Messages</button>
+        </div>
+
+        <!-- Browse Tab -->
+        <div id="browse-tab" class="fl-tab-content">
+            <div class="fl-filters">
+                <div class="fl-filter">
+                    <select id="cropFilter" onchange="loadListings()">
+                        <option value="">All Crops</option>
+                        <option value="rice">Rice</option>
+                        <option value="wheat">Wheat</option>
+                        <option value="tomato">Tomato</option>
+                        <option value="potato">Potato</option>
+                        <option value="onion">Onion</option>
+                    </select>
+                </div>
+                <div class="fl-filter">
+                    <select id="stateFilter" onchange="loadListings()">
+                        <option value="">All States</option>
+                        <option value="maharashtra">Maharashtra</option>
+                        <option value="punjab">Punjab</option>
+                        <option value="up">Uttar Pradesh</option>
+                        <option value="karnataka">Karnataka</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="fl-listings" id="listingsGrid">
+                <div class="fl-loading">Loading listings...</div>
+            </div>
+        </div>
+
+        <!-- My Listings Tab -->
+        <div id="my-listings-tab" class="fl-tab-content" style="display: none;">
+            <div class="fl-listings" id="myListingsGrid">
+                <div class="fl-loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- My Offers Tab -->
+        <div id="my-offers-tab" class="fl-tab-content" style="display: none;">
+            <div class="fl-listings" id="myOffersGrid">
+                <div class="fl-loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Deals Tab -->
+        <div id="deals-tab" class="fl-tab-content" style="display: none;">
+            <div class="fl-listings" id="dealsGrid">
+                <div class="fl-loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Messages Tab -->
+        <div id="messages-tab" class="fl-tab-content" style="display: none;">
+            <div class="fl-messages-tab">
+                <h3 style="margin-bottom: 1rem; color: var(--forest);">💬 Your Conversations</h3>
+                <div id="conversationsList">
+                    <div class="fl-loading">Loading conversations...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Listing Button -->
+    <button class="fl-create-btn" onclick="openCreateModal()">+</button>
+
+    <!-- Create Listing Modal -->
+    <div class="fl-modal" id="createModal">
+        <div class="fl-modal-content">
+            <h2 style="margin-bottom: 1.5rem; color: var(--forest);">Create New Listing</h2>
+            <form id="createForm">
+                <div class="fl-form-group">
+                    <label>Crop Name *</label>
+                    <input type="text" name="crop_name" required placeholder="e.g., Basmati Rice">
+                </div>
+                <div class="fl-form-group">
+                    <label>Quantity (tons) *</label>
+                    <input type="number" name="quantity" required min="1" placeholder="e.g., 50">
+                </div>
+                <div class="fl-form-group">
+                    <label>Expected Price (₹/ton) *</label>
+                    <input type="number" name="price" required min="1" placeholder="e.g., 45000">
+                </div>
+                <div class="fl-form-group">
+                    <label>State *</label>
+                    <select name="state" required>
+                        <option value="">Select State</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Karnataka">Karnataka</option>
+                    </select>
+                </div>
+                <div class="fl-form-group">
+                    <label>Location (City/Village) *</label>
+                    <input type="text" name="location" required placeholder="e.g., Nashik">
+                </div>
+                <div class="fl-form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" placeholder="Describe your produce quality, harvest date, etc."></textarea>
+                </div>
+                <div class="fl-form-actions">
+                    <button type="button" class="fl-cancel-btn" onclick="closeCreateModal()">Cancel</button>
+                    <button type="submit" class="fl-submit-btn">Create Listing</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Offer Modal -->
+    <div class="fl-modal" id="offerModal">
+        <div class="fl-modal-content">
+            <h2 style="margin-bottom: 1.5rem; color: var(--forest);">Make an Offer</h2>
+            <form id="offerForm">
+                <input type="hidden" name="listing_id" id="offerListingId">
+                <div class="fl-form-group">
+                    <label>Your Offer Price (₹/ton) *</label>
+                    <input type="number" name="offer_price" required min="1" placeholder="Enter your offer">
+                </div>
+                <div class="fl-form-group">
+                    <label>Message to Farmer</label>
+                    <textarea name="message" rows="3" placeholder="Introduce yourself, mention delivery requirements, etc."></textarea>
+                </div>
+                <div class="fl-form-actions">
+                    <button type="button" class="fl-cancel-btn" onclick="closeOfferModal()">Cancel</button>
+                    <button type="submit" class="fl-submit-btn">Submit Offer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Listing Modal -->
+    <div class="fl-modal" id="editModal">
+        <div class="fl-modal-content">
+            <h2 style="margin-bottom: 1.5rem; color: var(--forest);">Edit Listing</h2>
+            <form id="editForm">
+                <div class="fl-form-group">
+                    <label>Crop Name *</label>
+                    <input type="text" name="crop_name" required placeholder="e.g., Basmati Rice">
+                </div>
+                <div class="fl-form-group">
+                    <label>Quantity (tons) *</label>
+                    <input type="number" name="quantity" required min="1" placeholder="e.g., 50">
+                </div>
+                <div class="fl-form-group">
+                    <label>Expected Price (₹/ton) *</label>
+                    <input type="number" name="price" required min="1" placeholder="e.g., 45000">
+                </div>
+                <div class="fl-form-group">
+                    <label>State *</label>
+                    <select name="state" required>
+                        <option value="">Select State</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Karnataka">Karnataka</option>
+                    </select>
+                </div>
+                <div class="fl-form-group">
+                    <label>Location (City/Village) *</label>
+                    <input type="text" name="location" required placeholder="e.g., Nashik">
+                </div>
+                <div class="fl-form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" placeholder="Describe your produce quality, harvest date, etc."></textarea>
+                </div>
+                <div class="fl-form-actions">
+                    <button type="button" class="fl-cancel-btn" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="fl-submit-btn">Update Listing</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Offers Modal -->
+    <div class="fl-modal" id="offersModal">
+        <div class="fl-modal-content" style="max-width: 600px;">
+            <h2 style="margin-bottom: 1.5rem; color: var(--forest);">Offers on Your Listing</h2>
+            <div id="offersList">
+                <div class="fl-loading">Loading offers...</div>
+            </div>
+            <div class="fl-form-actions" style="margin-top: 1.5rem;">
+                <button type="button" class="fl-cancel-btn" onclick="closeOffersModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div class="fl-chat-modal" id="chatModal">
+        <div class="fl-chat-container">
+            <div class="fl-chat-header">
+                <button class="fl-chat-back" onclick="closeChatModal()">←</button>
+                <h3 id="chatTitle">Chat</h3>
+            </div>
+            <div class="fl-chat-messages" id="chatMessages">
+                <div class="fl-loading">Loading messages...</div>
+            </div>
+            <div class="fl-chat-input">
+                <input type="text" id="chatInput" placeholder="Type a message..." onkeypress="handleChatKeypress(event)">
+                <button onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Seller Modal -->
+    <div class="fl-modal" id="contactModal">
+        <div class="fl-modal-content">
+            <h2 style="margin-bottom: 1.5rem; color: var(--forest);">Contact Seller</h2>
+            <form id="contactForm">
+                <input type="hidden" name="listing_id" id="contactListingId">
+                <input type="hidden" name="receiver_id" id="contactReceiverId">
+                <div class="fl-form-group">
+                    <label>Your Message</label>
+                    <textarea name="message" rows="4" required placeholder="Hi! I'm interested in your produce..."></textarea>
+                </div>
+                <div class="fl-form-actions">
+                    <button type="button" class="fl-cancel-btn" onclick="closeContactModal()">Cancel</button>
+                    <button type="submit" class="fl-submit-btn">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/farmlink';
+        
+        // Crop emoji mapping
+        const cropEmojis = {
+            'rice': '🌾', 'wheat': '🌾', 'tomato': '🍅', 'potato': '🥔',
+            'onion': '🧅', 'corn': '🌽', 'cotton': '🌱', 'sugarcane': '🎋',
+            'default': '🌾'
+        };
+        
+        function getCropEmoji(cropName) {
+            const crop = cropName.toLowerCase();
+            for (const key in cropEmojis) {
+                if (crop.includes(key)) return cropEmojis[key];
+            }
+            return cropEmojis.default;
+        }
+        
+        // Tab switching
+        document.querySelectorAll('.fl-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.fl-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.fl-tab-content').forEach(c => c.style.display = 'none');
+                
+                tab.classList.add('active');
+                const tabId = tab.dataset.tab + '-tab';
+                document.getElementById(tabId).style.display = 'block';
+                
+                // Load data for the tab
+                if (tab.dataset.tab === 'browse') loadListings();
+                else if (tab.dataset.tab === 'my-listings') loadMyListings();
+                else if (tab.dataset.tab === 'my-offers') loadMyOffers();
+                else if (tab.dataset.tab === 'deals') loadDeals();
+                else if (tab.dataset.tab === 'messages') loadConversations();
+            });
+        });
+        
+        // Load all listings
+        async function loadListings() {
+            const crop = document.getElementById('cropFilter').value;
+            const state = document.getElementById('stateFilter').value;
+            
+            let url = `${API_BASE}/listings?`;
+            if (crop) url += `crop=${crop}&`;
+            if (state) url += `state=${state}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const grid = document.getElementById('listingsGrid');
+                
+                if (data.success && data.data.listings.length > 0) {
+                    grid.innerHTML = data.data.listings.map(listing => `
+                        <div class="fl-card">
+                            <div class="fl-card-img">${getCropEmoji(listing.crop_name)}</div>
+                            <div class="fl-card-body">
+                                <h3 class="fl-card-title">${listing.crop_name}</h3>
+                                <div class="fl-card-info">
+                                    <span>📍 ${listing.state}</span>
+                                    <span>📦 ${listing.quantity_tons} tons</span>
+                                </div>
+                                <div class="fl-card-price">₹${listing.price_per_ton.toLocaleString()} <span>/ton</span></div>
+                                <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">${listing.description || 'No description'}</p>
+                                <button class="fl-card-btn" onclick="makeOffer(${listing.id})">Make Offer</button>
+                                <button class="fl-card-btn fl-contact-btn" onclick="contactSeller(${listing.id}, ${listing.farmer_id})">💬 Contact Seller</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    grid.innerHTML = '<div class="fl-empty">No listings found. Be the first to list your produce!</div>';
+                }
+            } catch (error) {
+                console.error('Error loading listings:', error);
+                document.getElementById('listingsGrid').innerHTML = '<div class="fl-empty">Error loading listings. Please try again.</div>';
+            }
+        }
+        
+        // Load my listings
+        async function loadMyListings() {
+            try {
+                const response = await fetch(`${API_BASE}/my-listings`);
+                const data = await response.json();
+                
+                const grid = document.getElementById('myListingsGrid');
+                
+                if (data.success && data.data.listings.length > 0) {
+                    grid.innerHTML = data.data.listings.map(listing => `
+                        <div class="fl-card">
+                            <div class="fl-card-img">${getCropEmoji(listing.crop_name)}</div>
+                            <div class="fl-card-body">
+                                <h3 class="fl-card-title">${listing.crop_name}</h3>
+                                <div class="fl-card-info">
+                                    <span>📍 ${listing.state}</span>
+                                    <span>📦 ${listing.quantity_tons} tons</span>
+                                </div>
+                                <div class="fl-card-price">₹${listing.price_per_ton.toLocaleString()} <span>/ton</span></div>
+                                <p style="color: ${listing.status === 'ACTIVE' ? 'green' : 'red'}; font-weight: 600;">${listing.status}</p>
+                                <button class="fl-card-btn" style="background: #17a2b8; margin-bottom: 0.5rem;" onclick="viewOffers(${listing.id})">View Offers</button>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <button class="fl-card-btn" style="flex: 1; background: #027a4e;" onclick="editListing(${listing.id})">Edit</button>
+                                    <button class="fl-card-btn" style="flex: 1; background: #dc3545;" onclick="deleteListing(${listing.id})">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    grid.innerHTML = '<div class="fl-empty">You haven\'t created any listings yet. Click + to create one!</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        // Load my offers
+        async function loadMyOffers() {
+            try {
+                const response = await fetch(`${API_BASE}/my-offers`);
+                const data = await response.json();
+                
+                const grid = document.getElementById('myOffersGrid');
+                
+                if (data.success && data.data.offers.length > 0) {
+                    grid.innerHTML = data.data.offers.map(offer => {
+                        const status = (offer.status || 'PENDING').toUpperCase();
+                        const statusColor = status === 'ACCEPTED' ? 'green' : status === 'REJECTED' ? 'red' : 'orange';
+                        const cropEmoji = getCropEmoji(offer.crop_name || '');
+                        const dealId = offer.deal_id || null;
+                        return `
+                        <div class="fl-card">
+                            <div class="fl-card-img">${cropEmoji}</div>
+                            <div class="fl-card-body">
+                                <h3 class="fl-card-title">${offer.crop_name || 'Produce'}</h3>
+                                <div class="fl-card-info">
+                                    <span>Offer ID: #${offer.id}</span>
+                                    <span>Qty: ${offer.quantity_tons || 0} tons</span>
+                                </div>
+                                <div class="fl-card-price">₹${offer.offered_price.toLocaleString()} <span>/ton</span></div>
+                                <p style="color: ${statusColor}; font-weight: 600;">${status}</p>
+                                ${status === 'ACCEPTED' && dealId ? `
+                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                                    <button class="fl-card-btn" style="flex: 1; background: #28a745;" onclick="confirmDealFromOffer(${dealId})">✓ Confirm Deal</button>
+                                    <button class="fl-card-btn" style="flex: 1; background: #17a2b8;" onclick="contactSeller(${offer.listing_id}, ${offer.farmer_id})">💬 Contact</button>
+                                </div>
+                                ` : ''}
+                                ${status === 'PENDING' ? `
+                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                    <button class="fl-card-btn" style="flex: 1; background: #17a2b8;" onclick="contactSeller(${offer.listing_id}, ${offer.farmer_id})">💬 Contact Seller</button>
+                                </div>
+                                ` : ''}
+                                ${status === 'REJECTED' ? `
+                                <div style="margin-top: 1rem;">
+                                    <p style="color: #666; font-size: 0.85rem;">Your offer was not accepted.</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `}).join('');
+                } else {
+                    grid.innerHTML = '<div class="fl-empty">You haven\'t made any offers yet.</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        // Confirm deal from offer - updates deal status to ACTIVE
+        async function confirmDealFromOffer(dealId) {
+            try {
+                const response = await fetch(`${API_BASE}/deals/${dealId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'ACTIVE' })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Deal confirmed successfully! Check the Deals tab to track progress.');
+                    loadMyOffers();
+                    loadDeals();
+                } else {
+                    alert('Error: ' + (result.message || 'Failed to confirm deal'));
+                }
+            } catch (error) {
+                console.error('Error confirming deal:', error);
+                alert('Error confirming deal. Please try again.');
+            }
+        }
+        
+        // View deal by ID - switches to deals tab and highlights the deal
+        function viewDealById(dealId) {
+            switchTab('deals');
+            // Highlight the deal after a short delay to allow tab switch
+            setTimeout(() => {
+                const dealCards = document.querySelectorAll('#dealsGrid .fl-card');
+                dealCards.forEach(card => {
+                    if (card.innerHTML.includes(`Deal #${dealId}`)) {
+                        card.style.border = '3px solid #28a745';
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }, 300);
+        }
+        
+        // Load deals
+        async function loadDeals() {
+            try {
+                const response = await fetch(`${API_BASE}/deals`);
+                const data = await response.json();
+                
+                const grid = document.getElementById('dealsGrid');
+                
+                if (data.success && data.data.deals.length > 0) {
+                    grid.innerHTML = data.data.deals.map(deal => {
+                        const status = (deal.status || 'PENDING').toUpperCase();
+                        const statusColor = status === 'PENDING' ? 'orange' : status === 'ACTIVE' ? 'green' : status === 'COMPLETED' ? 'blue' : status === 'IN_TRANSIT' ? '#17a2b8' : 'red';
+                        return `
+                        <div class="fl-card">
+                            <div class="fl-card-body">
+                                <h3 class="fl-card-title">Deal #${deal.id}</h3>
+                                <div class="fl-card-info">
+                                    <span>Crop: ${deal.crop_name || 'Produce'}</span>
+                                    <span>Qty: ${deal.quantity_tons || deal.quantity} tons</span>
+                                </div>
+                                <div class="fl-card-price">₹${(deal.total_value || deal.total_amount || 0).toLocaleString()} <span>total</span></div>
+                                <p style="color: ${statusColor}; font-weight: 600;">${status}</p>
+                                ${status === 'PENDING' ? `
+                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                                    <button class="fl-card-btn" style="flex: 1; background: #28a745;" onclick="updateDealStatus(${deal.id}, 'ACTIVE')">Confirm Deal</button>
+                                    <button class="fl-card-btn" style="flex: 1; background: #dc3545;" onclick="updateDealStatus(${deal.id}, 'CANCELLED')">Cancel</button>
+                                </div>
+                                ` : ''}
+                                ${status === 'ACTIVE' ? `
+                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                                    <button class="fl-card-btn" style="flex: 1; background: #17a2b8; font-size: 0.8rem;" onclick="updateDealStatus(${deal.id}, 'IN_TRANSIT')">In Transit</button>
+                                    <button class="fl-card-btn" style="flex: 1; background: #28a745; font-size: 0.8rem;" onclick="updateDealStatus(${deal.id}, 'COMPLETED')">Complete</button>
+                                    <button class="fl-card-btn" style="flex: 1; background: #dc3545; font-size: 0.8rem;" onclick="updateDealStatus(${deal.id}, 'CANCELLED')">Cancel</button>
+                                </div>
+                                ` : ''}
+                                ${status === 'IN_TRANSIT' ? `
+                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                    <button class="fl-card-btn" style="flex: 1; background: #28a745;" onclick="updateDealStatus(${deal.id}, 'COMPLETED')">Mark Delivered</button>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `}).join('');
+                } else {
+                    grid.innerHTML = '<div class="fl-empty">No deals yet. Make an offer and get it accepted to create a deal!</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                grid.innerHTML = '<div class="fl-empty">Error loading deals. Please try again.</div>';
+            }
+        }
+        
+        // Create Modal
+        function openCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+        }
+        
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+            document.getElementById('createForm').reset();
+        }
+        
+        // Offer Modal
+        function makeOffer(listingId) {
+            document.getElementById('offerListingId').value = listingId;
+            document.getElementById('offerModal').classList.add('active');
+        }
+        
+        function closeOfferModal() {
+            document.getElementById('offerModal').classList.remove('active');
+            document.getElementById('offerForm').reset();
+        }
+        
+        // Form submissions
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                crop_name: form.crop_name.value,
+                quantity_tons: form.quantity.value,
+                price_per_ton: form.price.value,
+                state: form.state.value,
+                location: form.location.value,
+                description: form.description.value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/listings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Listing created successfully!');
+                    closeCreateModal();
+                    loadListings();
+                    loadMyListings();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error creating listing: ' + error.message);
+            }
+        });
+        
+        document.getElementById('offerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const listingId = document.getElementById('offerListingId').value;
+            const data = {
+                offered_price: form.offer_price.value,
+                message: form.message.value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/listings/${listingId}/offers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Offer submitted successfully!');
+                    closeOfferModal();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error submitting offer: ' + error.message);
+            }
+        });
+        
+        // Close modals on outside click
+        document.querySelectorAll('.fl-modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+        
+        // Edit Listing
+        let currentEditListingId = null;
+        
+        async function editListing(listingId) {
+            try {
+                const response = await fetch(`${API_BASE}/listings/${listingId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const listing = data.data.listing;
+                    currentEditListingId = listingId;
+                    
+                    // Populate edit form
+                    const form = document.getElementById('editForm');
+                    form.crop_name.value = listing.crop_name || listing.title || '';
+                    form.quantity.value = listing.quantity_tons || listing.quantity || '';
+                    form.price.value = listing.price_per_ton || listing.price_per_unit || '';
+                    form.state.value = listing.state || '';
+                    form.location.value = listing.location || '';
+                    form.description.value = listing.description || '';
+                    
+                    document.getElementById('editModal').classList.add('active');
+                } else {
+                    alert('Error loading listing: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            document.getElementById('editForm').reset();
+            currentEditListingId = null;
+        }
+        
+        // Edit form submission
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                crop_name: form.crop_name.value,
+                quantity_tons: form.quantity.value,
+                price_per_ton: form.price.value,
+                state: form.state.value,
+                location: form.location.value,
+                description: form.description.value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/listings/${currentEditListingId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Listing updated successfully!');
+                    closeEditModal();
+                    loadMyListings();
+                    loadListings();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error updating listing: ' + error.message);
+            }
+        });
+        
+        // Delete Listing
+        async function deleteListing(listingId) {
+            if (!confirm('Are you sure you want to delete this listing? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/listings/${listingId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Listing deleted successfully!');
+                    loadMyListings();
+                    loadListings();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error deleting listing: ' + error.message);
+            }
+        }
+        
+        // Update Deal Status
+        async function updateDealStatus(dealId, newStatus) {
+            const statusMessages = {
+                'ACTIVE': 'Confirm this deal?',
+                'IN_TRANSIT': 'Mark this deal as in transit?',
+                'COMPLETED': 'Mark this deal as completed?',
+                'CANCELLED': 'Are you sure you want to cancel this deal?',
+                'DELIVERED': 'Mark this deal as delivered?'
+            };
+            
+            if (!confirm(statusMessages[newStatus] || 'Update deal status?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/deals/${dealId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Deal status updated to ${newStatus}!`);
+                    loadDeals();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error updating deal: ' + error.message);
+            }
+        }
+        
+        // View Offers for a listing
+        async function viewOffers(listingId) {
+            try {
+                const response = await fetch(`${API_BASE}/listings/${listingId}/offers`);
+                const data = await response.json();
+                
+                const offersList = document.getElementById('offersList');
+                
+                if (data.success && data.data.offers.length > 0) {
+                    offersList.innerHTML = data.data.offers.map(offer => `
+                        <div style="border: 1px solid #ddd; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <h4 style="margin: 0; color: var(--forest);">Offer #${offer.id}</h4>
+                                <span style="padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem; font-weight: 600; 
+                                    background: ${offer.status === 'PENDING' ? '#fff3cd' : offer.status === 'ACCEPTED' ? '#d4edda' : '#f8d7da'}; 
+                                    color: ${offer.status === 'PENDING' ? '#856404' : offer.status === 'ACCEPTED' ? '#155724' : '#721c24'};">
+                                    ${offer.status}
+                                </span>
+                            </div>
+                            <p style="margin: 0.25rem 0; color: #666;"><strong>Buyer:</strong> ${offer.buyer_name || 'Unknown'}</p>
+                            <p style="margin: 0.25rem 0; color: #666;"><strong>Offered Price:</strong> ₹${offer.offered_price.toLocaleString()}/ton</p>
+                            <p style="margin: 0.25rem 0; color: #666;"><strong>Message:</strong> ${offer.message || 'No message'}</p>
+                            ${offer.status === 'PENDING' ? `
+                            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                <button class="fl-card-btn" style="flex: 1; background: #28a745;" onclick="acceptOffer(${offer.id})">Accept</button>
+                                <button class="fl-card-btn" style="flex: 1; background: #dc3545;" onclick="rejectOffer(${offer.id})">Reject</button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    offersList.innerHTML = '<div class="fl-empty">No offers on this listing yet.</div>';
+                }
+                
+                document.getElementById('offersModal').classList.add('active');
+            } catch (error) {
+                alert('Error loading offers: ' + error.message);
+            }
+        }
+        
+        function closeOffersModal() {
+            document.getElementById('offersModal').classList.remove('active');
+        }
+        
+        // Accept Offer
+        async function acceptOffer(offerId) {
+            if (!confirm('Accept this offer? This will create a deal and mark your listing as sold.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/offers/${offerId}/accept`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Offer accepted! A deal has been created. Check the Deals tab.');
+                    closeOffersModal();
+                    loadMyListings();
+                    loadDeals();
+                    loadListings(); // Refresh browse listings to remove sold item
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error accepting offer: ' + error.message);
+            }
+        }
+        
+        // Reject Offer
+        async function rejectOffer(offerId) {
+            if (!confirm('Reject this offer?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/offers/${offerId}/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Offer rejected.');
+                    // Refresh the offers list
+                    const activeListingId = document.querySelector('#offersModal .fl-card-btn')?.getAttribute('onclick')?.match(/\d+/)?.[0];
+                    if (activeListingId) {
+                        viewOffers(activeListingId);
+                    } else {
+                        closeOffersModal();
+                    }
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error rejecting offer: ' + error.message);
+            }
+        }
+        
+        // =========================================================================
+        // Messaging Functions
+        // =========================================================================
+        
+        let currentConversation = null;
+        
+        // Load conversations
+        async function loadConversations() {
+            try {
+                const response = await fetch(`${API_BASE}/conversations`);
+                const data = await response.json();
+                
+                const list = document.getElementById('conversationsList');
+                
+                if (data.success && data.data.conversations.length > 0) {
+                    list.innerHTML = data.data.conversations.map(conv => `
+                        <div class="fl-conversation-item" onclick="openChat('${conv.conversation_id}', '${conv.listing_title}', ${conv.other_user_id})">
+                            <div class="fl-conv-icon">${getCropEmoji(conv.listing_title)}</div>
+                            <div class="fl-conv-info">
+                                <div class="fl-conv-title">${conv.listing_title}</div>
+                                <div class="fl-conv-preview">${conv.last_message}</div>
+                            </div>
+                            <div class="fl-conv-meta">
+                                <div class="fl-conv-time">${formatTime(conv.last_message_at)}</div>
+                                ${conv.unread_count > 0 ? `<div class="fl-conv-unread">${conv.unread_count}</div>` : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div class="fl-empty">No conversations yet. Contact a seller from any listing to start chatting!</div>';
+                }
+            } catch (error) {
+                console.error('Error loading conversations:', error);
+                document.getElementById('conversationsList').innerHTML = '<div class="fl-empty">Error loading conversations.</div>';
+            }
+        }
+        
+        // Format time helper
+        function formatTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+            return date.toLocaleDateString();
+        }
+        
+        // Open chat modal
+        async function openChat(conversationId, listingTitle, otherUserId) {
+            currentConversation = {
+                id: conversationId,
+                listing_title: listingTitle,
+                other_user_id: otherUserId
+            };
+            
+            document.getElementById('chatTitle').textContent = listingTitle;
+            document.getElementById('chatModal').classList.add('active');
+            
+            await loadChatMessages(conversationId);
+        }
+        
+        // Load chat messages
+        async function loadChatMessages(conversationId) {
+            try {
+                const response = await fetch(`${API_BASE}/conversations/${conversationId}/messages`);
+                const data = await response.json();
+                
+                const messagesDiv = document.getElementById('chatMessages');
+                
+                if (data.success && data.data.messages.length > 0) {
+                    messagesDiv.innerHTML = data.data.messages.map(msg => `
+                        <div class="fl-chat-message ${msg.is_mine ? 'mine' : 'theirs'}">
+                            ${msg.message}
+                            <span class="time">${formatTime(msg.created_at)}</span>
+                        </div>
+                    `).join('');
+                    
+                    // Scroll to bottom
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                } else {
+                    messagesDiv.innerHTML = '<div class="fl-empty">No messages yet. Say hello!</div>';
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+        
+        // Close chat modal
+        function closeChatModal() {
+            document.getElementById('chatModal').classList.remove('active');
+            currentConversation = null;
+        }
+        
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentConversation) return;
+            
+            try {
+                // Extract listing_id from conversation_id (format: listingId-userId1-userId2)
+                const listingId = currentConversation.id.split('-')[0];
+                
+                const response = await fetch(`${API_BASE}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        listing_id: parseInt(listingId),
+                        receiver_id: currentConversation.other_user_id,
+                        message: message
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    input.value = '';
+                    await loadChatMessages(currentConversation.id);
+                } else {
+                    alert('Error sending message: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error sending message: ' + error.message);
+            }
+        }
+        
+        // Handle enter key in chat
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Contact seller from listing
+        function contactSeller(listingId, farmerId) {
+            document.getElementById('contactListingId').value = listingId;
+            document.getElementById('contactReceiverId').value = farmerId;
+            document.getElementById('contactModal').classList.add('active');
+        }
+        
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+            document.getElementById('contactForm').reset();
+        }
+        
+        // Contact form submission
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                listing_id: parseInt(form.listing_id.value),
+                receiver_id: parseInt(form.receiver_id.value),
+                message: form.message.value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Message sent!');
+                    closeContactModal();
+                    // Switch to messages tab
+                    document.querySelector('[data-tab="messages"]').click();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error sending message: ' + error.message);
+            }
+        });
+        
+        // Initial load
+        loadListings();
+    </script>
+</body>
+</html>

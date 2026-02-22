@@ -2,6 +2,7 @@
 AI Assistant Service for Kalpataru.
 Provides intelligent chat capabilities with image understanding and RAG-like context.
 Uses OpenRouter API for model access.
+Integrates with ML disease detection model for enhanced image analysis.
 """
 
 import os
@@ -9,6 +10,8 @@ import base64
 import json
 from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
+from pathlib import Path
+from io import BytesIO
 import requests
 
 from utils.logger import setup_logger
@@ -16,19 +19,36 @@ from config import settings
 
 logger = setup_logger(__name__)
 
+# Path to disease info JSON
+DISEASE_INFO_PATH = Path(__file__).parent.parent / "ml" / "disease_info.json"
+
 
 class AgriculturalKnowledgeBase:
     """
     A simple RAG-like knowledge base for agricultural context.
     Provides relevant context based on user queries.
+    Includes disease information from ML model for enhanced responses.
     """
     
     def __init__(self):
         self.knowledge_chunks = self._load_knowledge()
+        self.disease_info = self._load_disease_info()
+    
+    def _load_disease_info(self) -> Dict[str, Any]:
+        """Load disease information from JSON file for ML model integration."""
+        if DISEASE_INFO_PATH.exists():
+            try:
+                with open(DISEASE_INFO_PATH, 'r') as f:
+                    data = json.load(f)
+                    logger.info(f"Loaded disease info for {len(data.get('diseases', {}))} diseases")
+                    return data.get('diseases', {})
+            except Exception as e:
+                logger.warning(f"Could not load disease info: {e}")
+        return {}
     
     def _load_knowledge(self) -> List[Dict[str, str]]:
         """Load agricultural knowledge chunks for RAG."""
-        return [
+        knowledge_chunks = [
             {
                 "topic": "crop_recommendation",
                 "content": """
@@ -131,6 +151,48 @@ class AgriculturalKnowledgeBase:
                 """
             }
         ]
+        
+        # Add disease-specific knowledge from ML module
+        disease_knowledge = self._load_disease_knowledge()
+        knowledge_chunks.extend(disease_knowledge)
+        
+        return knowledge_chunks
+    
+    def _load_disease_knowledge(self) -> List[Dict[str, str]]:
+        """Load disease-specific knowledge chunks from disease_info.json."""
+        disease_chunks = []
+        
+        if DISEASE_INFO_PATH.exists():
+            try:
+                with open(DISEASE_INFO_PATH, 'r') as f:
+                    data = json.load(f)
+                    diseases = data.get('diseases', {})
+                    
+                    for disease_key, info in diseases.items():
+                        # Create a knowledge chunk for each disease
+                        chunk = {
+                            "topic": f"disease_{disease_key}",
+                            "content": f"""
+                            Disease: {info.get('disease', 'Unknown')}
+                            Plant: {info.get('plant', 'Unknown')}
+                            Severity: {info.get('severity', 'Unknown')}
+                            Description: {info.get('description', 'N/A')}
+                            Symptoms: {info.get('symptoms', 'N/A')}
+                            Treatment: {info.get('treatment', 'N/A')}
+                            Prevention: {info.get('prevention', 'N/A')}
+                            """
+                        }
+                        disease_chunks.append(chunk)
+                    
+                    logger.info(f"Added {len(disease_chunks)} disease knowledge chunks to RAG")
+            except Exception as e:
+                logger.warning(f"Could not load disease knowledge chunks: {e}")
+        
+        return disease_chunks
+    
+    def get_disease_info(self, disease_key: str) -> Optional[Dict[str, Any]]:
+        """Get detailed information for a specific disease."""
+        return self.disease_info.get(disease_key)
     
     def get_relevant_context(self, query: str, max_chunks: int = 3) -> str:
         """
@@ -225,14 +287,117 @@ When providing recommendations, consider the local context and practical constra
             return image_data
         return ""
     
+    def _run_disease_model(self, image_data: bytes) -> Optional[Dict[str, Any]]:
+        """
+        Run the ML disease detection model on image data.
+        
+        Args:
+            image_data: Raw image bytes
+            
+        Returns:
+            Prediction result dictionary or None if model fails
+        """
+        try:
+            from models.disease.inference import predict_disease
+            from io import BytesIO
+            
+            # Create a file-like object from bytes
+            class FileWrapper:
+                def __init__(self, data):
+                    self._data = data
+                    self._pos = 0
+                
+                def read(self):
+                    return self._data
+            
+            result = predict_disease(FileWrapper(image_data))
+            logger.info(f"ML disease prediction: {result.get('disease', 'Unknown')} "
+                       f"with {result.get('confidence', 0)*100:.1f}% confidence")
+            return result
+            
+        except Exception as e:
+            logger.warning(f"ML disease model prediction failed: {e}")
+            return None
+    
+    def build_disease_context(self, prediction_result: Dict[str, Any]) -> str:
+        """
+        Build RAG context from disease prediction results.
+        
+        Args:
+            prediction_result: Dictionary with ML model prediction results
+            
+        Returns:
+            Formatted context string for LLM
+        """
+        disease = prediction_result.get('disease', 'Unknown')
+        confidence = prediction_result.get('confidence', 0)
+        is_healthy = prediction_result.get('is_healthy', False)
+        severity = prediction_result.get('severity', 'Unknown')
+        
+        # Get detailed disease info from knowledge base
+        disease_info = self.knowledge_base.get_disease_info(disease)
+        
+        # Format top predictions
+        top_predictions = prediction_result.get('top_predictions', [])
+        top_pred_str = ""
+        if top_predictions:
+            top_pred_str = "\n".join([
+                f"  - {p.get('disease', 'Unknown')}: {p.get('confidence', 0)*100:.1f}%"
+                for p in top_predictions[:5]
+            ])
+        
+        context = f"""
+ML Model Disease Detection Results:
+=========================================
+- Predicted Disease: {disease}
+- Confidence: {confidence * 100:.1f}%
+- Is Healthy: {is_healthy}
+- Severity Level: {severity}
+"""
+        
+        # Add detailed disease information if available
+        if disease_info:
+            context += f"""
+Disease Information from Knowledge Base:
+-----------------------------------------
+- Plant: {disease_info.get('plant', 'N/A')}
+- Disease Name: {disease_info.get('disease', 'N/A')}
+- Description: {disease_info.get('description', 'N/A')}
+- Symptoms: {disease_info.get('symptoms', 'N/A')}
+- Treatment: {disease_info.get('treatment', 'N/A')}
+- Prevention: {disease_info.get('prevention', 'N/A')}
+"""
+        
+        # Add top predictions if available
+        if top_pred_str:
+            context += f"""
+Top Predictions:
+----------------
+{top_pred_str}
+"""
+        
+        return context
+    
     def _build_messages(
         self, 
         user_message: str, 
         image_data: Optional[Union[bytes, str]] = None,
         image_url: Optional[str] = None,
-        include_context: bool = True
+        include_context: bool = True,
+        ml_context: Optional[str] = None
     ) -> List[Dict[str, Any]]:
-        """Build message list for API call."""
+        """Build message list for API call.
+        
+        Args:
+            user_message: The user's text message
+            image_data: Optional image bytes or base64 string
+            image_url: Optional image URL
+            include_context: Whether to include RAG context
+            ml_context: Optional ML model prediction context
+            
+        Returns:
+            List of message dictionaries for the API
+        """
         messages = [
             {"role": "system", "content": self.system_prompt}
         ]
@@ -241,17 +406,28 @@ When providing recommendations, consider the local context and practical constra
         for msg in self.conversation_history[-self.max_history:]:
             messages.append(msg)
         
+        # Build enhanced message with context
+        context_parts = []
+        
+        # Add ML model context first (highest priority)
+        if ml_context:
+            context_parts.append(ml_context)
+        
         # Get relevant context from knowledge base
         if include_context:
-            context = self.knowledge_base.get_relevant_context(user_message)
-            if context:
-                enhanced_message = f"""Based on the following agricultural knowledge:
+            rag_context = self.knowledge_base.get_relevant_context(user_message)
+            if rag_context:
+                context_parts.append(f"Relevant Agricultural Knowledge:\n{rag_context}")
+        
+        # Build the final message
+        if context_parts:
+            enhanced_message = f"""Based on the following context:
 
-{context}
+{'=' * 50}
+{chr(10).join(context_parts)}
+{'=' * 50}
 
 User question: {user_message}"""
-            else:
-                enhanced_message = user_message
         else:
             enhanced_message = user_message
         
@@ -290,7 +466,8 @@ User question: {user_message}"""
         image_data: Optional[Union[bytes, str]] = None,
         image_url: Optional[str] = None,
         include_context: bool = True,
-        model: str = "nvidia/nemotron-nano-12b-v2-vl:free"
+        model: str = "nvidia/nemotron-nano-12b-v2-vl:free",
+        ml_context: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Send a chat message to the AI assistant.
@@ -301,12 +478,13 @@ User question: {user_message}"""
             image_url: Optional image URL
             include_context: Whether to include RAG context
             model: Model to use for generation
+            ml_context: Optional ML model prediction context
             
         Returns:
             Response dictionary with assistant's reply
         """
         try:
-            messages = self._build_messages(message, image_data, image_url, include_context)
+            messages = self._build_messages(message, image_data, image_url, include_context, ml_context)
             
             payload = {
                 "model": model,
@@ -408,6 +586,7 @@ User question: {user_message}"""
     ) -> Dict[str, Any]:
         """
         Analyze an image for agricultural insights.
+        For disease analysis, runs ML model first and includes results in context.
         
         Args:
             image_data: Image bytes or base64 string
@@ -415,24 +594,65 @@ User question: {user_message}"""
             image_url: Optional image URL
             
         Returns:
-            Analysis results
+            Analysis results with ML prediction data if applicable
         """
         analysis_prompts = {
             "general": "Analyze this agricultural image. Identify any plants, diseases, pests, or soil conditions visible. Provide helpful insights for farmers.",
-            "disease": "Examine this plant image for any signs of disease. Identify the disease if present, describe symptoms, and suggest treatment measures.",
+            "disease": "Based on the ML model analysis provided in the context, please provide detailed advice and recommendations for this plant image. Include treatment options, preventive measures, and when to consult a local agricultural expert.",
             "soil": "Analyze this soil image. Identify the soil type, assess its apparent health, and suggest improvements for better crop production.",
             "pest": "Examine this image for any pest insects or pest damage. Identify the pest if visible and suggest control measures.",
             "crop": "Identify the crop in this image. Assess its health status and provide recommendations for better yield."
         }
         
         prompt = analysis_prompts.get(analysis_type, analysis_prompts["general"])
+        ml_context = None
+        ml_result = None
         
-        return self.chat(
+        # For disease or general analysis, run ML model first
+        if analysis_type in ["disease", "general"]:
+            # Convert image_data to bytes if needed
+            if isinstance(image_data, str):
+                if image_data.startswith('data:'):
+                    # Extract base64 data from data URL
+                    import base64
+                    try:
+                        base64_data = image_data.split(',', 1)[1]
+                        image_bytes = base64.b64decode(base64_data)
+                    except Exception as e:
+                        logger.warning(f"Could not decode base64 image: {e}")
+                        image_bytes = None
+                else:
+                    image_bytes = None
+            else:
+                image_bytes = image_data
+            
+            # Run ML disease model
+            if image_bytes:
+                ml_result = self._run_disease_model(image_bytes)
+                if ml_result:
+                    ml_context = self.build_disease_context(ml_result)
+        
+        # Call chat with ML context
+        result = self.chat(
             message=prompt,
             image_data=image_data,
             image_url=image_url,
-            include_context=True
+            include_context=True,
+            ml_context=ml_context
         )
+        
+        # Include ML results in response if available
+        if ml_result:
+            result["ml_prediction"] = {
+                "disease": ml_result.get("disease"),
+                "confidence": ml_result.get("confidence"),
+                "is_healthy": ml_result.get("is_healthy"),
+                "severity": ml_result.get("severity"),
+                "treatment": ml_result.get("treatment"),
+                "prevention": ml_result.get("prevention")
+            }
+        
+        return result
 
 
 # Create singleton instance
@@ -447,7 +667,8 @@ def get_ai_assistant() -> AIAssistant:
 def chat_with_ai(
     message: str,
     image_data: Optional[Union[bytes, str]] = None,
-    image_url: Optional[str] = None
+    image_url: Optional[str] = None,
+    ml_context: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Convenience function to chat with AI assistant.
@@ -456,11 +677,12 @@ def chat_with_ai(
         message: User's message
         image_data: Optional image data
         image_url: Optional image URL
+        ml_context: Optional ML model prediction context
         
     Returns:
         Response dictionary
     """
-    return ai_assistant.chat(message, image_data, image_url)
+    return ai_assistant.chat(message, image_data, image_url, ml_context=ml_context)
 
 
 def analyze_agricultural_image(
@@ -469,13 +691,14 @@ def analyze_agricultural_image(
 ) -> Dict[str, Any]:
     """
     Convenience function to analyze agricultural images.
+    For disease analysis, runs ML model first and includes results.
     
     Args:
         image_data: Image data
-        analysis_type: Type of analysis
+        analysis_type: Type of analysis (general, disease, soil, pest, crop)
         
     Returns:
-        Analysis results
+        Analysis results with ML prediction data if applicable
     """
     return ai_assistant.analyze_image(image_data, analysis_type)
 
